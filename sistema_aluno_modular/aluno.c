@@ -29,6 +29,7 @@ int matriculaExiste(const char *filename, int matricula) {
 
 void cadastrarAluno(FILE *arquivo) {
     Aluno aluno;
+    int i;
     printf("\n--- CADASTRO DE ALUNO ---\n");
     int matriculaValida = 0;
     do {
@@ -48,7 +49,7 @@ void cadastrarAluno(FILE *arquivo) {
     fgets(aluno.turma, 6, stdin);
     aluno.turma[strcspn(aluno.turma, "\n")] = '\0';
     printf("Digite as 4 notas:\n");
-    for(int i = 0; i < 4; i++) {
+    for(i = 0; i < 4; i++) {
         printf("Nota %d: ", i+1);
         scanf("%f", &aluno.nota[i]);
     }
@@ -122,7 +123,7 @@ void relatorioTurma() {
 }
 
 void relatorioAluno() {
-    int matricula;
+    int matricula, i;
     printf("\nMatricula para relatorio: ");
     scanf("%d", &matricula);
     limparBuffer();
@@ -141,7 +142,7 @@ void relatorioAluno() {
         if (a.matricula == matricula) {
             float media = (a.nota[0] + a.nota[1] + a.nota[2] + a.nota[3]) / 4;
             float maior = a.nota[0], menor = a.nota[0];
-            for (int i = 1; i < 4; i++) {
+            for (i = 1; i < 4; i++) {
                 if (a.nota[i] > maior) maior = a.nota[i];
                 if (a.nota[i] < menor) menor = a.nota[i];
             }
