@@ -48,19 +48,11 @@ void cadastrarAluno(FILE *arquivo) {
     printf("Turma: ");
     fgets(aluno.turma, 6, stdin);
     aluno.turma[strcspn(aluno.turma, "\n")] = '\0';
-printf("Digite as 4 notas:\n");
-for(i = 0; i < 4; i++) {
-    do {
+    printf("Digite as 4 notas:\n");
+    for(i = 0; i < 4; i++) {
         printf("Nota %d: ", i+1);
         scanf("%f", &aluno.nota[i]);
-        
-        limparBuffer();
-        
-        if(aluno.nota[i] < 0 || aluno.nota[i] > 10) {
-            printf("Nota inválida! Digite um valor entre 0 e 10.\n");
-        }
-    } while(aluno.nota[i] < 0 || aluno.nota[i] > 10);
-}
+    }
     limparBuffer();
     fprintf(arquivo, "%d;%s;%s;%.2f;%.2f;%.2f;%.2f\n",
             aluno.matricula, aluno.nome, aluno.turma,
