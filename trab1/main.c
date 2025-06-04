@@ -1,212 +1,217 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <locale.h>
 
 typedef struct {
-	
-	int matricula;
-	char nome[50];
-	char turma[6];
-	float nota[4];
-	
-} aluno;
+    int matricula;
+    char nome[50];
+    char turma[6];
+    float nota[4];
+} Aluno;
 
-void cadastro (FILE *pont_arquiv) {
-	
-	aluno aluno;
-	int i;
-	
-		printf("Digite a matricula do aluno: \n");
-		scanf("%d", &aluno.matricula);
-		getchar();
-		
-		printf("Digite o nome do aluno: \n");
-		fgets(aluno.nome, sizeof(aluno.nome), stdin);
-		
-		printf("Digite a turma do aluno: \n");
-		fgets(aluno.turma, sizeof(aluno.turma), stdin);
-		getchar();
-		
-		for(i = 0; i < 4; i++) {
-			
-		printf("Digite a nota do aluno: \n");	
-		scanf("%f", &aluno.nota[i]);
-	
-	}
-	
-		fprintf(pont_arquiv, "%d;%s;%s;%.2f;%.2f;%.2f;%.2f", aluno.matricula, aluno.nome, aluno.turma, aluno.nota[0], aluno.nota[1], aluno.nota[2], aluno.nota[3]);
-		
-		printf("aluno cadastrado com sucesso! \n");
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void cadastrarAluno(FILE *arquivo) {
+    Aluno aluno;
+    
+    printf("\n--- CADASTRO DE ALUNO ---\n");
+    
+    printf("Matricula: ");
+    scanf("%d", &aluno.matricula);
+    limparBuffer();
+    
+    printf("Nome: ");
+    fgets(aluno.nome, 50, stdin);
+    aluno.nome[strcspn(aluno.nome, "\n")] = '\0';
+    
+    printf("Turma: ");
+    fgets(aluno.turma, 6, stdin);
+    aluno.turma[strcspn(aluno.turma, "\n")] = '\0';
+    
+    printf("Digite as 4 notas:\n");
+    for(int i = 0; i < 4; i++) {
+        printf("Nota %d: ", i+1);
+        scanf("%f", &aluno.nota[i]);
+    }
+    limparBuffer();
+    
+    fprintf(arquivo, "%d;%s;%s;%.2f;%.2f;%.2f;%.2f\n", 
+            aluno.matricula, aluno.nome, aluno.turma, 
+            aluno.nota[0], aluno.nota[1], aluno.nota[2], aluno.nota[3]);
+    
+    printf("\n✓ Aluno cadastrado com sucesso!\n");
 }
 
 void mostrarDados() {
-    FILE *arquivo;
-    char linha[200]; // Tamanho suficiente para uma linha
-
-    arquivo = fopen("arquivo_cadastro.txt", "r");
-
+    FILE *arquivo = fopen("alunos.txt", "r");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo para leitura!\n");
+        printf("\nErro: Nenhum dado cadastrado ainda.\n");
         return;
     }
 
-    printf("\n--- DADOS CADASTRADOS ---\n");
+    printf("\n--- TODOS OS ALUNOS ---\n");
+    printf("MATRICULA | %-30s | TURMA | NOTAS\n", "NOME");
+    printf("----------|-------------------------------|-------|----------------\n");
 
+    char linha[200];
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        printf("%s", linha);
-    }
+        Aluno a;
+        sscanf(linha, "%d;%[^;];%[^;];%f;%f;%f;%f",
+               &a.matricula, a.nome, a.turma,
+               &a.nota[0], &a.nota[1], &a.nota[2], &a.nota[3]);
 
+        printf("%9d | %-30s | %-5s | %.1f, %.1f, %.1f, %.1f\n",
+               a.matricula, a.nome, a.turma,
+               a.nota[0], a.nota[1], a.nota[2], a.nota[3]);
+    }
     fclose(arquivo);
-    printf("\n--------------------------\n");
+    printf("\n");
 }
 
 void relatorioTurma() {
-    FILE *arquivo;
-    char linha[200];
-    char turmaBusca[5];
-    int count = 0;
-    int i;
-    float somaMedias = 0, maiorNota = -1, menorNota = 11;
+    char turma[6];
+    printf("\nTurma para relatorio: ");
+    fgets(turma, 6, stdin);
+    turma[strcspn(turma, "\n")] = '\0';
 
-    printf("Digite a turma para o relatório: ");
-    fgets(turmaBusca, sizeof(turmaBusca), stdin);
-
-    arquivo = fopen("arquivo_cadastro.txt", "r");
+    FILE *arquivo = fopen("alunos.txt", "r");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        printf("Nenhum aluno cadastrado.\n");
         return;
     }
 
+    int count = 0;
+    float somaMedias = 0, maiorNota = -1, menorNota = 11;
+    char linha[200];
+
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        aluno a;
+        Aluno a;
         sscanf(linha, "%d;%[^;];%[^;];%f;%f;%f;%f",
                &a.matricula, a.nome, a.turma,
                &a.nota[0], &a.nota[1], &a.nota[2], &a.nota[3]);
 
-        if (strncmp(a.turma, turmaBusca, strlen(turmaBusca) - 1) == 0) {
-            float media = 0;
-            for (i = 0; i < 4; i++) {
-                media += a.nota[i];
+        if (strcmp(a.turma, turma) == 0) {
+            float media = (a.nota[0] + a.nota[1] + a.nota[2] + a.nota[3]) / 4;
+            somaMedias += media;
+            count++;
+
+            for (int i = 0; i < 4; i++) {
                 if (a.nota[i] > maiorNota) maiorNota = a.nota[i];
                 if (a.nota[i] < menorNota) menorNota = a.nota[i];
             }
-            media /= 4;
-            somaMedias += media;
-            count++;
         }
     }
+    fclose(arquivo);
 
     if (count > 0) {
-        printf("\nRelatório da turma %s", turmaBusca);
-        printf("Média geral da turma: %.2f\n", somaMedias / count);
-        printf("Maior nota da turma: %.2f\n", maiorNota);
-        printf("Menor nota da turma: %.2f\n", menorNota);
+        printf("\nRELATORIO DA TURMA %s\n", turma);
+        printf("Alunos: %d\n", count);
+        printf("Media geral: %.2f\n", somaMedias / count);
+        printf("Maior nota: %.2f\n", maiorNota);
+        printf("Menor nota: %.2f\n", menorNota);
     } else {
-        printf("Nenhum aluno encontrado na turma %s", turmaBusca);
+        printf("Nenhum aluno encontrado na turma %s\n", turma);
     }
-
-    fclose(arquivo);
 }
 
 void relatorioAluno() {
-    FILE *arquivo;
-    char linha[200];
-    int matriculaBusca;
-    int achou = 0;
-    int i;
+    int matricula;
+    printf("\nMatricula para relatorio: ");
+    scanf("%d", &matricula);
+    limparBuffer();
 
-    printf("Digite a matrícula do aluno para o relatório: ");
-    scanf("%d", &matriculaBusca);
-    getchar();
-
-    arquivo = fopen("arquivo_cadastro.txt", "r");
+    FILE *arquivo = fopen("alunos.txt", "r");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        printf("Nenhum aluno cadastrado.\n");
         return;
     }
 
-    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        aluno a;
+    int encontrado = 0;
+    char linha[200];
+
+    while (fgets(linha, sizeof(linha), arquivo) != NULL && !encontrado) {
+        Aluno a;
         sscanf(linha, "%d;%[^;];%[^;];%f;%f;%f;%f",
                &a.matricula, a.nome, a.turma,
                &a.nota[0], &a.nota[1], &a.nota[2], &a.nota[3]);
 
-        if (a.matricula == matriculaBusca) {
-            float media = 0, maior = a.nota[0], menor = a.nota[0];
-            for (i = 0; i < 4; i++) {
-                media += a.nota[i];
+        if (a.matricula == matricula) {
+            float media = (a.nota[0] + a.nota[1] + a.nota[2] + a.nota[3]) / 4;
+            float maior = a.nota[0], menor = a.nota[0];
+            
+            for (int i = 1; i < 4; i++) {
                 if (a.nota[i] > maior) maior = a.nota[i];
                 if (a.nota[i] < menor) menor = a.nota[i];
             }
-            media /= 4;
 
-            printf("\nRelatório do aluno %s", a.nome);
-            printf("Turma: %s", a.turma);
-            printf("Média: %.2f\n", media);
-            printf("Maior nota: %.2f\n", maior);
-            printf("Menor nota: %.2f\n", menor);
-            achou = 1;
-            break;
+            printf("\nRELATORIO DO ALUNO\n");
+            printf("Nome: %s\n", a.nome);
+            printf("Turma: %s\n", a.turma);
+            printf("Notas: %.1f, %.1f, %.1f, %.1f\n", 
+                   a.nota[0], a.nota[1], a.nota[2], a.nota[3]);
+            printf("Media: %.2f\n", media);
+            printf("Maior nota: %.1f\n", maior);
+            printf("Menor nota: %.1f\n", menor);
+            
+            encontrado = 1;
         }
     }
 
-    if (!achou) {
-        printf("Aluno com matrícula %d não encontrado.\n", matriculaBusca);
+    if (!encontrado) {
+        printf("Aluno com matricula %d nao encontrado.\n", matricula);
     }
-
     fclose(arquivo);
 }
 
+void menu() {
+    printf("\n=== SISTEMA DE CADASTRO ===\n");
+    printf("1. Cadastrar aluno\n");
+    printf("2. Listar todos os alunos\n");
+    printf("3. Relatorio por turma\n");
+    printf("4. Relatorio individual\n");
+    printf("0. Sair\n");
+    printf("Escolha uma opcao: ");
+}
+
 int main() {
-	
-	FILE *pont_arquiv;
-	int opcao;
-	
-	pont_arquiv = fopen("arquivo_cadastro.txt", "a+");
-	
-	if(pont_arquiv == NULL)
-	{
-		printf("Erro na abertura do arquivo! \n");
-		exit(1);
-	}
-	
-	do {
-	
-		printf("*****MENU***** \n");
-		printf("1 - cadastrar aluno \n");
-		printf("0 - encerrar programa \n");
-		printf("3 - Relatório individual\n");
-		printf("4 - Relatório por turma\n");
-		scanf("%d", &opcao);
-		getchar();
-		
-		switch (opcao) {
-			
-			case 1:
-				cadastro(pont_arquiv);
-				break;
-			
-			case 0:
-				printf("Encerrando programa... \n");
-				break;
-				
-			case 3:
-    			relatorioAluno();
-    			break;
-			
-			case 4:
-    			relatorioTurma();
-    			break;
-				
-			default:
-				printf("Existe isso nao, burro!");
-				break;
-		}
-		
-	} while (opcao != 0);
-	
-	fclose(pont_arquiv);
-	
-		
-	return 0;
+    FILE *arquivo = fopen("alunos.txt", "a+");
+    if (arquivo == NULL) {
+        printf("Erro ao criar arquivo de dados.\n");
+        return 1;
+    }
+
+    int opcao;
+    do {
+        menu();
+        scanf("%d", &opcao);
+        limparBuffer();
+
+        switch(opcao) {
+            case 1:
+                cadastrarAluno(arquivo);
+                break;
+            case 2:
+                mostrarDados();
+                break;
+            case 3:
+                relatorioTurma();
+                break;
+            case 4:
+                relatorioAluno();
+                break;
+            case 0:
+                printf("Encerrando o sistema...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+        }
+    } while (opcao != 0);
+
+    fclose(arquivo);
+    return 0;
 }
