@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <locale.h>
 
 typedef struct {
     int matricula;
@@ -168,14 +167,57 @@ void relatorioAluno() {
     fclose(arquivo);
 }
 
+void listarAlunosPorTurma() {
+    FILE *arquivo;
+    char linha[200];
+    char turmaBusca[6];
+    int encontrou = 0;
+
+    printf("Digite a turma que deseja listar: ");
+    fgets(turmaBusca, sizeof(turmaBusca), stdin);
+    turmaBusca[strcspn(turmaBusca, "\n")] = '\0';
+
+    arquivo = fopen("alunos.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    printf("\n--- ALUNOS DA TURMA %s ---\n", turmaBusca);
+
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        Aluno a;
+
+        sscanf(linha, "%d;%[^;];%[^;];%f;%f;%f;%f",
+               &a.matricula, a.nome, a.turma,
+               &a.nota[0], &a.nota[1], &a.nota[2], &a.nota[3]);
+
+        if (strcmp(a.turma, turmaBusca) == 0) {
+            printf("Matricula: %d\n", a.matricula);
+            printf("Nome: %s\n", a.nome);
+            printf("Notas: %.2f, %.2f, %.2f, %.2f\n", 
+                  a.nota[0], a.nota[1], a.nota[2], a.nota[3]);
+            printf("------------------------------\n");
+            encontrou = 1;
+        }
+    }
+
+    if (!encontrou) {
+        printf("Nenhum aluno encontrado nessa turma.\n");
+    }
+
+    fclose(arquivo);
+}
+
 void menu() {
-    printf("\n=== SISTEMA DE CADASTRO ===\n");
+    printf("\n=== SISTEMA DE CADASTRO DE ALUNOS ===\n");
     printf("1. Cadastrar aluno\n");
     printf("2. Listar todos os alunos\n");
-    printf("3. Relatorio por turma\n");
-    printf("4. Relatorio individual\n");
+    printf("3. Relatório por turma\n");
+    printf("4. Relatório individual\n");
+    printf("5. Listar alunos por turma\n");
     printf("0. Sair\n");
-    printf("Escolha uma opcao: ");
+    printf("Escolha uma opção: ");
 }
 
 int main() {
@@ -204,11 +246,14 @@ int main() {
             case 4:
                 relatorioAluno();
                 break;
+            case 5:
+                listarAlunosPorTurma();
+                break;
             case 0:
                 printf("Encerrando o sistema...\n");
                 break;
             default:
-                printf("Opção inválida!\n");
+                printf("Opçao invalida!\n");
         }
     } while (opcao != 0);
 
