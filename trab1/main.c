@@ -15,14 +15,43 @@ void limparBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+int matriculaExiste(const char *filename, int matricula) {
+    FILE *arquivo = fopen(filename, "r");
+    if (arquivo == NULL) {
+        return 0;
+    }
+    
+    char linha[200];
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        int matriculaAtual;
+        sscanf(linha, "%d", &matriculaAtual);
+        if (matriculaAtual == matricula) {
+            fclose(arquivo);
+            return 1;
+        }
+    }
+    
+    fclose(arquivo);
+    return 0;
+}
+
 void cadastrarAluno(FILE *arquivo) {
     Aluno aluno;
     
     printf("\n--- CADASTRO DE ALUNO ---\n");
     
-    printf("Matricula: ");
-    scanf("%d", &aluno.matricula);
-    limparBuffer();
+    int matriculaValida = 0;
+    do {
+        printf("Matricula: ");
+        scanf("%d", &aluno.matricula);
+        limparBuffer();
+        
+        if (matriculaExiste("alunos.txt", aluno.matricula)) {
+            printf("Erro: Matricula %d ja existe. Por favor, insira uma matricula unica.\n", aluno.matricula);
+        } else {
+            matriculaValida = 1;
+        }
+    } while (!matriculaValida);
     
     printf("Nome: ");
     fgets(aluno.nome, 50, stdin);
@@ -43,7 +72,7 @@ void cadastrarAluno(FILE *arquivo) {
             aluno.matricula, aluno.nome, aluno.turma, 
             aluno.nota[0], aluno.nota[1], aluno.nota[2], aluno.nota[3]);
     
-    printf("\n✓ Aluno cadastrado com sucesso!\n");
+    printf("\nAluno cadastrado com sucesso!\n");
 }
 
 void mostrarDados() {
@@ -213,11 +242,11 @@ void menu() {
     printf("\n=== SISTEMA DE CADASTRO DE ALUNOS ===\n");
     printf("1. Cadastrar aluno\n");
     printf("2. Listar todos os alunos\n");
-    printf("3. Relatório por turma\n");
-    printf("4. Relatório individual\n");
+    printf("3. Relatorio por turma\n");
+    printf("4. Relatorio individual\n");
     printf("5. Listar alunos por turma\n");
     printf("0. Sair\n");
-    printf("Escolha uma opção: ");
+    printf("Escolha uma opcao: ");
 }
 
 int main() {
