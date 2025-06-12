@@ -72,7 +72,7 @@ void cadastrarProduto() {
     static int inicializado = 0;
     if (!inicializado) {
         srand((unsigned)time(NULL)); 
-        // unsigned: Faz a fun??o n?o inicializar mais de uma vez para n?o correr o risco de gerar n?meros/c?digos repetidos
+        // unsigned: Faz a funcao nao inicializar mais de uma vez para nao correr o risco de gerar numeros/codigos repetidos
         inicializado = 1;
     }
 
@@ -97,7 +97,7 @@ void cadastrarProduto() {
     } while (codigoExiste);
 
     printf("\nCadastro de Produto\n");
-    printf("C?digo gerado: %d\n", novo.codigo);
+    printf("Codigo gerado: %d\n", novo.codigo);
 
     printf("Nome: ");
     scanf(" %[^\n]", buffer);
@@ -111,7 +111,7 @@ void cadastrarProduto() {
     printf("Quantidade: ");
     scanf("%d", &novo.quantidade);
 
-    printf("Pre?o unit?rio: ");
+    printf("Preco unitario: ");
     scanf("%f", &novo.preco);
 
   
@@ -121,6 +121,7 @@ void cadastrarProduto() {
 
     fclose(f);
     printf("Produto cadastrado com sucesso!\n");
+    
 }
 
 
@@ -297,4 +298,3 @@ void relatorioValorEstoque() {
 
     printf("Valor total do estoque: R$ %.2f\n", valorTotal);
 }
-
