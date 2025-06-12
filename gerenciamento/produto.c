@@ -220,7 +220,7 @@ void listarProdutos() {
     int encontrou = 0;
     for(i = 0; i < qtdProdutos; i++) {
         if ((escolha == 1 && strcmp(produtos[i].nome, filtro) == 0) || // 0 == 0
-        //str = string; cmp = compara??o; compara nome ou marca ao filtro, se as strings forem iguais equivalem a 0
+        //str = string; cmp = comparacao; compara nome ou marca ao filtro, se as strings forem iguais equivalem a 0
             (escolha == 2 && strcmp(produtos[i].marca, filtro) == 0)) { 
             printf("Codigo: %d | Nome: %s | Marca: %s | Quantidade: %d | Preco: %.2f\n",
                 produtos[i].codigo, produtos[i].nome, produtos[i].marca,
