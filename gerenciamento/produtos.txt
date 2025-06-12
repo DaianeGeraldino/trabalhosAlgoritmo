@@ -1,0 +1,20 @@
+6578;Chocolate;Nestle;10;5.00
+1234;Leite;Italac;20;4.50
+2345;Arroz;Tio João;50;23.90
+3456;Feijão;Camil;30;7.80
+4567;Óleo de Soja;Liza;25;6.50
+5678;Café;Pilão;40;10.00
+6789;Açúcar;União;60;3.70
+7890;Macarrão;Renata;35;4.20
+8901;Farinha de Trigo;Dona Benta;18;5.90
+9012;Sabão em Pó;OMO;15;12.00
+1122;Detergente;Ypê;40;2.50
+2233;Shampoo;Pantene;22;14.99
+3344;Condicionador;Pantene;20;14.99
+4455;Desinfetante;Veja;33;5.60
+5566;Papel Higiênico;Neve;50;3.30
+6677;Sabonete;Lux;60;2.10
+7788;Escova de Dente;Colgate;30;4.80
+8899;Pasta de Dente;Colgate;28;6.20
+9900;Desodorante;Rexona;25;9.90
+1111;Água Sanitária;Qboa;40;3.00
